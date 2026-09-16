@@ -25,8 +25,9 @@ class InsightFaceFaceRecognitionService(YOLOv8FaceRecognitionService):
     pass
 
 
-# Canonical singleton used by integrations that need the active service.
-insightface_face_service = InsightFaceFaceRecognitionService()
+# Reuse the already-created legacy singleton during migration so importing
+# this boundary does not initialize a second heavyweight model stack.
+insightface_face_service = yolov8_face_service
 
 __all__ = [
     "InsightFaceFaceRecognitionService",
