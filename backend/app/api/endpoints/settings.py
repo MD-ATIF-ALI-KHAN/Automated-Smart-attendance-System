@@ -46,7 +46,7 @@ SETTINGS_FILE = "data/app_settings.json"
 
 
 def _create_insightface_face_service():
-    """Create YOLOv8 face service on-demand.
+    """Create the canonical InsightFace service on-demand.
 
     This endpoint module is imported at app startup. ML deps like torch/ultralytics
     are optional in some deployments, so we avoid importing them globally.
@@ -58,7 +58,7 @@ def _create_insightface_face_service():
             status_code=503,
             detail=(
                 "InsightFace/ArcFace recognition is not available in this environment. "
-                "Install the ML dependencies (e.g. torch, ultralytics, insightface) "
+                "Install the ML dependencies (e.g. torch, insightface) "
                 "and restart the server."
             ),
         ) from exc
