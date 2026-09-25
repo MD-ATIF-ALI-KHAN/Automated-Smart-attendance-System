@@ -1,5 +1,5 @@
 """
-Rebuild YOLOv8 Face Encodings for All Students (using InsightFace/ArcFace)
+Rebuild InsightFace Face Encodings for All Students (using InsightFace/ArcFace)
 Run this to enroll all students with high-quality face embeddings
 """
 
