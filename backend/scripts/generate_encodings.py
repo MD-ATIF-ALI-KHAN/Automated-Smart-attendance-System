@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.services.video_processing import VideoProcessingService
-from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
 from app.models.database import DatabaseManager
 import asyncio
 
@@ -27,7 +27,7 @@ async def process_existing_videos():
     print("=" * 70)
     
     video_service = VideoProcessingService()
-    yolo_service = YOLOv8FaceRecognitionService()
+    face_service = InsightFaceFaceRecognitionService()
     
     for student in students:
         student_id = student['student_id']
@@ -66,7 +66,7 @@ async def process_existing_videos():
             
             for frame_path in frame_paths:
                 if os.path.exists(frame_path):
-                    encoding = await yolo_service.generate_encoding(frame_path, student_id)
+                    encoding = await face_service.generate_encoding(frame_path, student_id)
                     if encoding is not None:
                         faces_detected += 1
                         encodings_generated = True
