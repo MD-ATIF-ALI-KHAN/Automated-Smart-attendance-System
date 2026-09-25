@@ -31,3 +31,13 @@ Do not write the paper as a YOLOv8 + ArcFace attendance pipeline at this stage. 
 ## Research safety rule
 
 Adaptive encoding updates must never change the representation set before a held-out test prediction is scored. Evaluation runs must record whether adaptation is disabled, frozen, or applied only between sessions.
+
+
+## Phase 1 migration update
+
+- A canonical service boundary was added at `backend/app/services/insightface_face_recognition.py`.
+- Active enrollment, rebuild, settings, student, verification, optimized-attendance, and continual-learning integrations were migrated to the canonical InsightFace boundary.
+- The optimized attendance endpoint now calls the implemented `process_attendance_image()` path rather than the obsolete `process_attendance()` call.
+- The obsolete `optimized_processor` references in the optimized endpoint were removed from the active paths.
+- The historical `yolov8_face_recognition.py` implementation remains temporarily as a compatibility implementation; it has not yet been deleted or renamed because that would be a larger behavior-changing refactor.
+- This migration therefore establishes the research-facing service boundary without claiming that all historical implementation terminology has already been removed.
