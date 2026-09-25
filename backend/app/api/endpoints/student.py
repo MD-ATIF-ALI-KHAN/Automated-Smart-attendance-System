@@ -232,8 +232,8 @@ async def upload_student_video(
         if result.get('success') and result.get('frame_paths'):
             try:
                 # Process each frame to detect and encode faces
-                from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
-                yolo_service = YOLOv8FaceRecognitionService()
+                from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
+                face_service = InsightFaceFaceRecognitionService()
                 
                 logger.info(f"Processing {len(result['frame_paths'])} frames for student {student_id}")
                 
