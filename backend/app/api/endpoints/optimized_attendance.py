@@ -23,7 +23,7 @@ from app.services.face_recognition import FaceRecognitionService
 
 router = APIRouter()
 
-# Initialize YOLOv8 + InsightFace service (singleton)
+# Initialize canonical InsightFace/ArcFace service (singleton)
 _insightface_service = None
 
 def get_insightface_service():
@@ -73,7 +73,7 @@ async def mark_attendance_optimized(
         
         print(f"Processing attendance for class {class_name}...")
         
-        # Use YOLOv8 + InsightFace (ArcFace) for high-accuracy identification
+        # Use canonical InsightFace (ArcFace) pipeline for identification
         face_service = get_insightface_service()
         result = await face_service.process_attendance_image(image_path, class_name)
         
