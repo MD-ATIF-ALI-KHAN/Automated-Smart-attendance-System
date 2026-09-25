@@ -206,7 +206,7 @@ def _get_continual_learning_settings(self) -> Dict:
         return {'enabled': False}
 
 
-# Add these methods to YOLOv8FaceRecognitionService class
+# Add these methods to InsightFaceFaceRecognitionService class
 YOLOv8FaceRecognitionService.add_encoding_from_attendance = add_encoding_from_attendance
 YOLOv8FaceRecognitionService._assess_encoding_quality = _assess_encoding_quality
 YOLOv8FaceRecognitionService._save_face_crop = _save_face_crop
