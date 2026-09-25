@@ -16,7 +16,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 os.chdir(str(BACKEND_ROOT))
 
-from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
 from app.services.student_management import StudentManagementService
 
 
@@ -39,7 +39,7 @@ async def main():
     
     # Initialize services
     student_service = StudentManagementService()
-    face_service = YOLOv8FaceRecognitionService()
+    face_service = InsightFaceFaceRecognitionService()
     
     # Clear existing encodings
     face_service.known_face_encodings = {}
