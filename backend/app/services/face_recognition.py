@@ -8,7 +8,7 @@ except ImportError:
     
 if not FACE_RECOGNITION_AVAILABLE:
     print("⚠️ face_recognition not available (requires dlib compilation)")
-    print("   Using YOLOv8 for face detection only")
+    print("   Using InsightFace for face detection only")
 
 import cv2
 import numpy as np
@@ -23,10 +23,10 @@ from app.utils.gpu_utils import gpu_manager
 
 # Try to import YOLOv8 service
 try:
-    from app.services.yolov8_face_recognition import yolov8_face_service
-    YOLOV8_AVAILABLE = True
+    from app.services.insightface_face_recognition import insightface_face_service
+    INSIGHTFACE_AVAILABLE = True
 except ImportError:
-    yolov8_face_service = None  # Define as None if import fails
+    insightface_face_service = None  # Define as None if import fails
     YOLOV8_AVAILABLE = False
     print("YOLOv8 not available. Install required packages: ultralytics, deepface, torch")
 
@@ -49,7 +49,7 @@ class FaceRecognitionService:
         
         # YOLOv8 integration
         self.use_yolov8 = False  # Will be set from settings
-        self.yolov8_service = yolov8_face_service if YOLOV8_AVAILABLE else None
+        self.insightface_service = yolov8_face_service if YOLOV8_AVAILABLE else None
         
         self._load_settings()
         
