@@ -15,7 +15,7 @@ os.chdir(str(BACKEND_ROOT))
 
 import cv2
 import numpy as np
-from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
 from app.services.student_management import StudentManagementService
 
 
@@ -26,7 +26,7 @@ async def main():
     
     # Initialize services
     student_service = StudentManagementService()
-    face_service = YOLOv8FaceRecognitionService()
+    face_service = InsightFaceFaceRecognitionService()
     await face_service.load_encodings()
 
     # Increase detector input size to help detect smaller faces in large frames
