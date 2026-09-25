@@ -384,7 +384,9 @@ async def update_detection_settings(settings: Dict) -> Dict:
             json.dump(app_settings, f, indent=2)
         
         # Clear caches to force reload with new settings
-        optimized_processor.clear_all_caches()
+        face_service = get_insightface_service()
+        face_service._class_students_cache.clear()
+        face_service._class_encodings_cache.clear()
         
         # Reload settings in face service
         face_service = FaceRecognitionService()
@@ -485,7 +487,9 @@ async def update_recognition_settings(settings: Dict) -> Dict:
             json.dump(app_settings, f, indent=2)
         
         # Clear caches to force reload with new settings
-        optimized_processor.clear_all_caches()
+        face_service = get_insightface_service()
+        face_service._class_students_cache.clear()
+        face_service._class_encodings_cache.clear()
         
         # Reload settings in face service
         face_service = FaceRecognitionService()
