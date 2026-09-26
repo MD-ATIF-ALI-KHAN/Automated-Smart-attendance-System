@@ -107,15 +107,18 @@ A configuration snapshot should be stored alongside experiment results so that a
 
 ## 8. Open configuration audit
 
-The following items must be resolved before Phase 2 experiments:
+The following items remain to be resolved before Phase 2 experiments:
 1. Identify the exact runtime data/app_settings.json used by the current application.
-2. Remove stale useYOLOv8 naming from the canonical configuration path, or explicitly document it as a backward-compatible alias.
-3. Remove/repair stale legacy references in FaceRecognitionService such as self.yolov8_service if that compatibility service is no longer intended to own the path.
-4. Confirm the exact active similarity threshold at runtime.
-5. Confirm whether detection confidence affects the canonical attendance result.
-6. Confirm the exact verification interval and whether auto-approval is active.
-7. Confirm enrollment encoding count per student.
-8. Confirm whether adaptive encoding is enabled in the user's current local configuration.
+2. Confirm the exact active similarity threshold at runtime.
+3. Confirm whether detection confidence affects the canonical attendance result.
+4. Confirm the exact verification interval and whether auto-approval is active.
+5. Confirm enrollment encoding count per student.
+6. Confirm whether adaptive encoding is enabled in the user's current local configuration.
+
+Resolved during Phase 1 stabilization:
+- useInsightFace is now the preferred canonical setting key; useYOLOv8 remains only as a backward-compatible alias.
+- Stale FaceRecognitionService.self.yolov8_service references were removed.
+- InsightFace enrollment/attendance routing no longer requires the optional legacy dlib-based face_recognition package.
 
 ## 9. Research rule
 
