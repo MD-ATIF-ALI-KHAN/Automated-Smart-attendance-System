@@ -7,8 +7,8 @@ except ImportError:
     FACE_RECOGNITION_AVAILABLE = False
     
 if not FACE_RECOGNITION_AVAILABLE:
-    print("⚠️ face_recognition not available (requires dlib compilation)")
-    print("   Using InsightFace for face detection only")
+    print("⚠️ face_recognition legacy backend not available (requires dlib compilation)")
+
 
 import cv2
 import numpy as np
@@ -197,14 +197,14 @@ class FaceRecognitionService:
     async def generate_encoding(self, image_path: str, student_id: str) -> Optional[np.ndarray]:
         """Generate HIGH-QUALITY face encoding for a student image - GPU OPTIMIZED"""
         try:
-            # Check if face_recognition is available
-            if not FACE_RECOGNITION_AVAILABLE:
-                print("⚠️ face_recognition not available, cannot generate encoding")
-                return None
-            
-            # Use InsightFace if enabled
+            # InsightFace is the canonical research path and does not depend on dlib.
             if self.use_insightface and self.insightface_service:
                 return await self.insightface_service.generate_encoding(image_path, student_id)
+            
+            # Legacy system is only used when InsightFace is unavailable/disabled.
+            if not FACE_RECOGNITION_AVAILABLE:
+                print("⚠️ Neither InsightFace nor face_recognition is available.")
+                return None
             
             # Legacy system below
             # Load image
