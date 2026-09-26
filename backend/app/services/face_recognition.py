@@ -21,14 +21,14 @@ from app.services.student_management import StudentManagementService
 from app.utils.gpu_image_processing import gpu_processor
 from app.utils.gpu_utils import gpu_manager
 
-# Try to import YOLOv8 service
+# Import the canonical InsightFace service boundary.
 try:
     from app.services.insightface_face_recognition import insightface_face_service
     INSIGHTFACE_AVAILABLE = True
 except ImportError:
-    insightface_face_service = None  # Define as None if import fails
+    insightface_face_service = None
     INSIGHTFACE_AVAILABLE = False
-    print("YOLOv8 not available. Install required packages: ultralytics, deepface, torch")
+    print("InsightFace service not available. Install the required InsightFace dependencies.")
 
 class FaceRecognitionService:
     def __init__(self):
@@ -47,7 +47,7 @@ class FaceRecognitionService:
         else:
             self.settings_file = "data/app_settings.json"
         
-        # YOLOv8 integration
+        # Canonical research recognition path.
         self.use_insightface = False  # Will be set from settings
         self.insightface_service = insightface_face_service if INSIGHTFACE_AVAILABLE else None
         
@@ -86,11 +86,15 @@ class FaceRecognitionService:
                 with open(self.settings_file, 'r') as f:
                     settings = json.load(f)
                     
-                    # Check if YOLOv8 should be used
-                    self.use_insightface = settings.get('useYOLOv8', True)  # Default to YOLOv8 for better accuracy
+                    # InsightFace is the canonical recognition path. Keep useYOLOv8
+                    # as a backward-compatible settings alias for older installations.
+                    self.use_insightface = settings.get(
+                        'useInsightFace',
+                        settings.get('useYOLOv8', True)
+                    )
                     
                     if self.use_insightface and not INSIGHTFACE_AVAILABLE:
-                        print("⚠️  YOLOv8 requested but not available. Falling back to face_recognition library.")
+                        print("⚠️  InsightFace requested but not available. Falling back to face_recognition library.")
                         self.use_insightface = False
                     
                     print(f"🔧 Recognition System: {'InsightFace (ArcFace)' if self.use_insightface else 'face_recognition (legacy)'}")
@@ -157,10 +161,10 @@ class FaceRecognitionService:
     async def load_encodings(self):
         """Load existing face encodings from file"""
         try:
-            # Use YOLOv8 if enabled
-            if self.use_insightface and self.yolov8_service:
-                await self.yolov8_service.load_encodings()
-                print(f"✅ Loaded YOLOv8 encodings for {len(self.yolov8_service.known_face_encodings)} students")
+            # Use InsightFace if enabled
+            if self.use_insightface and self.insightface_service:
+                await self.insightface_service.load_encodings()
+                print(f"✅ Loaded InsightFace encodings for {len(self.insightface_service.known_face_encodings)} students")
                 return
             
             # Legacy system
@@ -198,9 +202,9 @@ class FaceRecognitionService:
                 print("⚠️ face_recognition not available, cannot generate encoding")
                 return None
             
-            # Use YOLOv8 if enabled
-            if self.use_insightface and self.yolov8_service:
-                return await self.yolov8_service.generate_encoding(image_path, student_id)
+            # Use InsightFace if enabled
+            if self.use_insightface and self.insightface_service:
+                return await self.insightface_service.generate_encoding(image_path, student_id)
             
             # Legacy system below
             # Load image
@@ -285,9 +289,9 @@ class FaceRecognitionService:
     async def clear_all_encodings(self) -> bool:
         """Clear all face encodings"""
         try:
-            # Use YOLOv8 if enabled
-            if self.use_insightface and self.yolov8_service:
-                return await self.yolov8_service.clear_all_encodings()
+            # Use InsightFace if enabled
+            if self.use_insightface and self.insightface_service:
+                return await self.insightface_service.clear_all_encodings()
             
             # Legacy system
             # Clear in-memory encodings
@@ -308,9 +312,9 @@ class FaceRecognitionService:
     async def remove_encoding(self, student_id: str):
         """Remove a student's face encoding"""
         try:
-            # Use YOLOv8 if enabled
-            if self.use_insightface and self.yolov8_service:
-                await self.yolov8_service.remove_encoding(student_id)
+            # Use InsightFace if enabled
+            if self.use_insightface and self.insightface_service:
+                await self.insightface_service.remove_encoding(student_id)
                 return
             
             # Legacy system
@@ -553,17 +557,15 @@ class FaceRecognitionService:
     async def process_attendance_image(self, image_path: str, class_name: str) -> Dict:
         """Process a classroom image and identify students - OPTIMIZED FOR LONG DISTANCE"""
         try:
-            # Check if face_recognition is available
-            if not FACE_RECOGNITION_AVAILABLE:
-                print("⚠️ face_recognition not available - using YOLOv8 detection only")
-                return await self._process_with_yolov8_only(image_path, class_name)
-            
-            # Use InsightFace if enabled (RECOMMENDED for better accuracy)
-            if self.use_insightface and self.yolov8_service:
+            # InsightFace is the canonical research attendance path.
+            if self.use_insightface and self.insightface_service:
                 print("🚀 Using InsightFace (ArcFace) for attendance processing")
-                return await self.yolov8_service.process_attendance_image(image_path, class_name)
+                return await self.insightface_service.process_attendance_image(image_path, class_name)
             
-            # Legacy system below
+            # Legacy system is only used when InsightFace is unavailable/disabled.
+            if not FACE_RECOGNITION_AVAILABLE:
+                print("⚠️ face_recognition is unavailable and InsightFace is disabled.")
+                return await self._process_with_yolov8_only(image_path, class_name)
             print("⚠️  Using legacy face_recognition library (YOLOv8 recommended for better accuracy)")
             
             # Load and enhance the image
@@ -721,8 +723,8 @@ class FaceRecognitionService:
     async def get_recognition_stats(self) -> Dict:
         """Get face recognition statistics"""
         # Use InsightFace if enabled
-        if self.use_insightface and self.yolov8_service:
-            stats = await self.yolov8_service.get_recognition_stats()
+        if self.use_insightface and self.insightface_service:
+            stats = await self.insightface_service.get_recognition_stats()
             stats['system'] = 'InsightFace (ArcFace)'
             return stats
         
@@ -886,8 +888,8 @@ class FaceRecognitionService:
     def clear_cache(self):
         """Clear all caches"""
         # Clear YOLOv8 cache if using it
-        if self.use_insightface and self.yolov8_service:
-            self.yolov8_service.clear_cache()
+        if self.use_insightface and self.insightface_service:
+            self.insightface_service.clear_cache()
         
         # Clear legacy cache
         self._class_students_cache.clear()
