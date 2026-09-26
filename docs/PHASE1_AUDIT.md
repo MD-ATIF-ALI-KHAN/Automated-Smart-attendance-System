@@ -32,6 +32,14 @@ Do not write the paper as a YOLOv8 + ArcFace attendance pipeline at this stage. 
 
 Adaptive encoding updates must never change the representation set before a held-out test prediction is scored. Evaluation runs must record whether adaptation is disabled, frozen, or applied only between sessions.
 
+## Legacy-service cleanup update
+
+- FaceRecognitionService now routes enrollment, attendance processing, encoding management, and recognition statistics through the canonical insightface_face_service when InsightFace is enabled.
+- The stale self.yolov8_service references in that compatibility service were removed.
+- InsightFace routing no longer depends on the optional legacy face_recognition/dlib package being installed.
+- useInsightFace is now the preferred setting key, with useYOLOv8 retained only as a backward-compatible alias for older local configurations.
+- The branch remains research-only; no change has been merged into main.
+
 
 ## Phase 1 migration update
 
