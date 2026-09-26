@@ -97,10 +97,10 @@ def test_integration():
     print("="*60)
     
     try:
-        from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+        from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
         
         print("Initializing face recognition service...")
-        service = YOLOv8FaceRecognitionService()
+        service = InsightFaceFaceRecognitionService()
         
         # Check if quality utils are initialized
         if hasattr(service, 'quality_assessor') and service.quality_assessor is not None:
