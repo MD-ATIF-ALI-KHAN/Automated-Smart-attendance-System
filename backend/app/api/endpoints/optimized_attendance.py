@@ -1,6 +1,6 @@
 """
 Optimized Attendance API Endpoints
-High-performance attendance marking endpoints with YOLOv8 face recognition
+High-performance attendance marking endpoints using the canonical InsightFace/ArcFace recognition pipeline
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
@@ -12,36 +12,35 @@ import time
 
 try:
     # Optional dependency: requires torch + ultralytics + insightface, etc.
-    from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
-    _YOLOV8_SERVICE_AVAILABLE = True
+    from app.services.insightface_face_recognition import insightface_face_service
+    _INSIGHTFACE_SERVICE_AVAILABLE = True
 except ImportError:
-    YOLOv8FaceRecognitionService = None  # type: ignore
-    _YOLOV8_SERVICE_AVAILABLE = False
+    insightface_face_service = None  # type: ignore
+    _INSIGHTFACE_SERVICE_AVAILABLE = False
 from app.services.attendance import AttendanceService
 from app.services.student_management import StudentManagementService
 from app.services.face_recognition import FaceRecognitionService
 
 router = APIRouter()
 
-# Initialize YOLOv8 + InsightFace service (singleton)
-_yolov8_service = None
+# Initialize canonical InsightFace/ArcFace service (singleton)
+_insightface_service = None
 
-def get_yolov8_service():
-    global _yolov8_service
-    if not _YOLOV8_SERVICE_AVAILABLE or YOLOv8FaceRecognitionService is None:
+def get_insightface_service():
+    global _insightface_service
+    if not _INSIGHTFACE_SERVICE_AVAILABLE or insightface_face_service is None:
         raise HTTPException(
             status_code=503,
             detail=(
-                "YOLOv8 optimized attendance is not available in this environment. "
-                "Install the ML dependencies (e.g. torch, ultralytics, insightface) and restart the server."
+                "InsightFace optimized attendance is not available in this environment. "
+                "Install the ML dependencies (e.g. torch, insightface) and restart the server."
             ),
         )
-    if _yolov8_service is None:
-        _yolov8_service = YOLOv8FaceRecognitionService()
-        # Increase threshold to reduce false positives
-        _yolov8_service.similarity_threshold = 0.50  # Increased from 0.40 to 0.50
-        print("✅ YOLOv8 + InsightFace (ArcFace) Service initialized with 50% threshold")
-    return _yolov8_service
+    if _insightface_service is None:
+        _insightface_service = insightface_face_service
+        _insightface_service.similarity_threshold = 0.50
+        print("✅ Canonical InsightFace (ArcFace) service initialized with 0.50 threshold")
+    return _insightface_service
 
 @router.post("/mark-attendance-optimized")
 async def mark_attendance_optimized(
@@ -74,9 +73,9 @@ async def mark_attendance_optimized(
         
         print(f"Processing attendance for class {class_name}...")
         
-        # Use YOLOv8 + InsightFace (ArcFace) for high-accuracy identification
-        yolov8_service = get_yolov8_service()
-        result = await yolov8_service.process_attendance(image_path, class_name)
+        # Use canonical InsightFace (ArcFace) pipeline for identification
+        face_service = get_insightface_service()
+        result = await face_service.process_attendance_image(image_path, class_name)
         
         # Save attendance record
         attendance_service = AttendanceService()
@@ -116,9 +115,9 @@ async def mark_attendance_optimized(
 async def get_performance_metrics() -> Dict:
     """Get performance metrics for the YOLOv8 system"""
     try:
-        yolov8_service = get_yolov8_service()
+        face_service = get_insightface_service()
         
-        # Get YOLOv8 stats
+        # Get InsightFace stats
         stats = {
             "total_students_enrolled": len(yolov8_service.face_descriptors),
             "model_status": "YOLOv8n (CPU mode)",
@@ -188,7 +187,7 @@ async def batch_attendance_optimized(
                         buffer.write(content)
                     
                     # Process attendance
-                    result = await optimized_processor.process_attendance_optimized(image_path, class_name)
+                    result = await face_service.process_attendance_image(image_path, class_name)
                     
                     # Save attendance record
                     attendance_service = AttendanceService()
@@ -266,7 +265,7 @@ async def get_system_status() -> Dict:
     """Get comprehensive system status"""
     try:
         # Get performance metrics
-        metrics = optimized_processor.get_performance_metrics()
+        metrics = {"service": "InsightFace/ArcFace", "model": face_service.face_recognition_model}
         
         # Get face recognition stats
         face_service = FaceRecognitionService()
@@ -277,7 +276,7 @@ async def get_system_status() -> Dict:
         attendance_stats = await attendance_service.get_statistics()
         
         return {
-            "system_status": "optimized",
+            "system_status": "canonical-insightface",
             "performance_metrics": metrics,
             "face_recognition": face_stats,
             "attendance_stats": attendance_stats,
@@ -385,7 +384,9 @@ async def update_detection_settings(settings: Dict) -> Dict:
             json.dump(app_settings, f, indent=2)
         
         # Clear caches to force reload with new settings
-        optimized_processor.clear_all_caches()
+        face_service = get_insightface_service()
+        face_service._class_students_cache.clear()
+        face_service._class_encodings_cache.clear()
         
         # Reload settings in face service
         face_service = FaceRecognitionService()
@@ -486,7 +487,9 @@ async def update_recognition_settings(settings: Dict) -> Dict:
             json.dump(app_settings, f, indent=2)
         
         # Clear caches to force reload with new settings
-        optimized_processor.clear_all_caches()
+        face_service = get_insightface_service()
+        face_service._class_students_cache.clear()
+        face_service._class_encodings_cache.clear()
         
         # Reload settings in face service
         face_service = FaceRecognitionService()

@@ -9,7 +9,7 @@ import numpy as np
 sys.path.append(os.getcwd())
 
 from app.models.database import DatabaseManager
-from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
 from app.utils.verification_manager import VerificationManager
 from app.services.attendance_helper import add_verified_student
 
@@ -102,7 +102,7 @@ async def test_verification_flow(verification_id, attendance_id, student_id):
         print(f"Face crop shape: {face_crop.shape}")
         
         # Initialize service
-        yolov8_service = YOLOv8FaceRecognitionService()
+        face_service = InsightFaceFaceRecognitionService()
         
         # Attempt to add encoding
         try:

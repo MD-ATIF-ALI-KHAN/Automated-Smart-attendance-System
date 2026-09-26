@@ -42,7 +42,7 @@ async def verify_attendance_face(
     try:
         from app.utils.verification_manager import verification_manager
         from app.services.attendance import AttendanceService
-        from app.services.yolov8_face_recognition import yolov8_face_service
+        from app.services.insightface_face_recognition import insightface_face_service
         
         # Validate action
         valid_actions = ['approve', 'reject', 'unknown']
@@ -138,9 +138,9 @@ async def verify_attendance_face(
                         
                         
                         
-                        # Get YOLOv8 service and add encoding
-                        yolov8_service = yolov8_face_service
-                        if not yolov8_service.known_face_encodings:
+                        # Get InsightFace service and add encoding
+                        face_service = insightface_face_service
+                        if not face_service.known_face_encodings:
                             await yolov8_service.load_encodings()
                         print(f"✅ YOLOv8 service initialized")
                         

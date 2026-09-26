@@ -45,25 +45,25 @@ class RebuildEncodingsRequest(BaseModel):
 SETTINGS_FILE = "data/app_settings.json"
 
 
-def _create_yolov8_face_service():
-    """Create YOLOv8 face service on-demand.
+def _create_insightface_face_service():
+    """Create the canonical InsightFace service on-demand.
 
     This endpoint module is imported at app startup. ML deps like torch/ultralytics
     are optional in some deployments, so we avoid importing them globally.
     """
     try:
-        from app.services.yolov8_face_recognition import YOLOv8FaceRecognitionService
+        from app.services.insightface_face_recognition import InsightFaceFaceRecognitionService
     except Exception as exc:  # ImportError + runtime import errors
         raise HTTPException(
             status_code=503,
             detail=(
-                "YOLOv8/InsightFace recognition is not available in this environment. "
-                "Install the ML dependencies (e.g. torch, ultralytics, insightface) "
+                "InsightFace/ArcFace recognition is not available in this environment. "
+                "Install the ML dependencies (e.g. torch, insightface) "
                 "and restart the server."
             ),
         ) from exc
 
-    return YOLOv8FaceRecognitionService()
+    return InsightFaceFaceRecognitionService()
 
 
 def _reset_rebuild_status():
@@ -88,7 +88,7 @@ def _set_rebuild_status(**updates: Any):
 
 async def _rebuild_encodings(student_id: Optional[str]):
     student_service = StudentManagementService()
-    face_service = _create_yolov8_face_service()
+    face_service = _create_insightface_face_service()
 
     if face_service.face_analyzer is None:
         raise RuntimeError("InsightFace not initialized")

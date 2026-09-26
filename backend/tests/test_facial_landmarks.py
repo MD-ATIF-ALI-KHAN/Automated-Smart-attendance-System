@@ -43,7 +43,7 @@ class TestFacialLandmarks68Analyzer(unittest.TestCase):
         # Create blank image
         image = np.zeros((200, 200, 3), dtype=np.uint8)
         
-        result = self.analyzer.analyze(image)
+        result = self.analyzer.comprehensive_analysis(image)
         
         # Should return None or empty result for no face
         self.assertIsNotNone(result)
